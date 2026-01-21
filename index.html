@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kotak Saran - DaFz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Roboto Mono', monospace;
+      min-height: 100vh;
+      color: #e0e0ff;
+      background: linear-gradient(270deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff, #ff0000);
+      background-size: 800% 800%;
+      animation: rgbFlow 18s ease infinite;
+      position: relative;
+    }
+    @keyframes rgbFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .container {
+      position: relative;
+      z-index: 10;
+      max-width: 480px;
+      margin: 5vh auto;
+      padding: 4vw 5vw;
+      background: rgba(8,8,30,0.94);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      border: 2px solid transparent;
+      border-image: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff) 1;
+      border-image-slice: 1;
+      animation: rotateRGB 10s linear infinite;
+      box-shadow: 0 0 25px rgba(255,100,255,0.18);
+    }
+    @keyframes rotateRGB {
+      0% { border-image-source: linear-gradient(0deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); }
+      25% { border-image-source: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); }
+      50% { border-image-source: linear-gradient(180deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); }
+      75% { border-image-source: linear-gradient(270deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); }
+      100% { border-image-source: linear-gradient(360deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); }
+    }
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      text-align: center;
+      font-size: clamp(1.8rem, 7vw, 2.5rem);
+      background: linear-gradient(90deg, #ff6ec7, #7873f5, #00ffea, #ff3366);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4vw;
+      text-shadow: 0 0 20px rgba(120,115,245,0.8);
+    }
+    label {
+      display: block;
+      margin: 3vw 0 1.5vw;
+      font-weight: bold;
+      color: #d0d0ff;
+      font-size: clamp(0.9rem, 4vw, 1.1rem);
+    }
+    input, textarea {
+      width: 100%;
+      padding: 3vw;
+      background: rgba(20,20,50,0.85);
+      border: 1px solid #7873f5;
+      border-radius: 10px;
+      color: #fff;
+      font-family: monospace;
+      font-size: clamp(0.95rem, 4vw, 1rem);
+    }
+    textarea { min-height: 25vh; resize: vertical; }
+    button {
+      width: 100%;
+      padding: 4vw;
+      margin-top: 6vw;
+      font-size: clamp(1.1rem, 5vw, 1.3rem);
+      font-weight: bold;
+      background: linear-gradient(90deg, #ff3366, #cc33ff, #3366ff);
+      background-size: 200%;
+      animation: btnGlow 5s infinite;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    @keyframes btnGlow { 0%{background-position:0%} 50%{background-position:100%} 100%{background-position:0%} }
+    #status {
+      margin-top: 5vw;
+      padding: 3vw;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: bold;
+      font-size: clamp(1rem, 4.5vw, 1.2rem);
+    }
+    .success { background: rgba(0,220,80,0.45); color: #0f0; }
+    .error { background: rgba(220,0,0,0.45); color: #f00; }
+    #channel-link {
+      margin-top: 2vw;
+      text-align: center;
+      font-size: clamp(0.9rem, 4vw, 1rem);
+    }
+    #channel-link a {
+      color: #00BFFF;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 500px) {
+      .container { margin: 4vh auto; padding: 5vw 6vw; border-radius: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="overlay"></div>
+
+<div class="container">
+  <h1>Kotak Saran</h1>
+
+  <form id="form">
+    <label>Judul Saran:</label>
+    <input id="title" placeholder="Masukkan judul saran..." required>
+
+    <label>Saran:</label>
+    <textarea id="saran" rows="10" placeholder="Tulis saran, laporan, atau ide kamu di sini..." required></textarea>
+
+    <button type="submit">KIRIM SARAN</button>
+  </form>
+
+  <div id="status"></div>
+  <div id="channel-link"></div>
+</div>
+
+<script>
+  const webhook = "https://discord.com/api/webhooks/1463461917199695884/9VhGnxnXbNivU3ODdZG8H6wYxa-4gP4C1E4ciSneceHdwnf3i2cxg5dzLvEJzcLsGV9B";
+  const channelUrl = "https://discord.com/channels/ID_SERVER/ID_CHANNEL"; // GANTI INI DENGAN LINK CHANNEL LO
+
+  document.getElementById("form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const status = document.getElementById("status");
+    const linkDiv = document.getElementById("channel-link");
+    status.textContent = "Mengirim saran...";
+    status.className = "";
+    linkDiv.innerHTML = "";
+
+    const title = document.getElementById("title").value.trim();
+    const saran = document.getElementById("saran").value.trim();
+
+    if (!title || !saran) {
+      status.textContent = "Judul dan saran wajib diisi!";
+      status.className = "error";
+      return;
+    }
+
+    const payload = {
+      username: "BotSaran",
+      avatar_url: "https://cdn.discordapp.com/embed/avatars/4.png",
+      embeds: [{
+        title: title,
+        description: saran,
+        color: 0x00BFFF,
+        timestamp: new Date().toISOString(),
+        footer: {
+          text: "Dikirim dari Kotak Saran - DaFz"
+        }
+      }]
+    };
+
+    try {
+      const response = await fetch(webhook, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        status.textContent = "Saran berhasil dikirim!";
+        status.className = "success";
+        linkDiv.innerHTML = `<a href="${channelUrl}" target="_blank">Buka channel Discord sekarang</a>`;
+        document.getElementById("title").value = "";
+        document.getElementById("saran").value = "";
+      } else {
+        const errText = await response.text();
+        status.textContent = `Gagal mengirim: ${response.status} - ${errText}`;
+        status.className = "error";
+      }
+    } catch (error) {
+      status.textContent = "Error: " + error.message;
+      status.className = "error";
+    }
+  });
+</script>
+
+</body>
+</html>
